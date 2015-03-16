@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<meta charset="utf-8" />
+<title>WebSocket Chat Sample</title>
+<script type="text/javascript" th:src="@{/js/jquery-2.1.3.min.js}" src="js/jquery-2.1.3.min.js"></script>
+<script src="sockjs-0.3.4.min.js" th:src="@{/js/sockjs-0.3.4.min.js}"></script>
+<script src="stomp.js" th:src="@{/js/stomp.js}"></script>
+<style type="text/css">
+#chatarea {
+	overflow-y: scroll;
+	width:  600px;
+	height: 600px;
+}
+
+.message-box {
+	margin: 5px 0 5px 0;
+}
+
+.username {
+	font-weight: bold;
+}
+</style>
+<script type="text/javascript" th:inline="javascript">
+/*<![CDATA[*/
+var userName = /*[[${userName}]]*/'userName'
+var stompClient = null;
+
+function connect() {
+	var socket = new SockJS('/message');
+	stompClient = Stomp.over(socket);
+	stompClient.connect({}, function(frame) {
+		setConnected(true);
+		console.log('Connected: ' + frame);
+		stompClient.subscribe('/topic/message', function(response) {
+			var body = JSON.parse(response.body);
+			showMessage(body.userName, body.content);
+		});
+	});
+}
+
+function setConnected(flg) {
+	$('#connect').prop('disabled', flg);
+	$('#disconnect').prop('disabled', !flg);
+	$('#conversationDiv').css('visibility', flg ? 'visible' : 'hidden');
+	$('#response').innerHTML = '';
+}
+
+function disconnect() {
+	stompClient.disconnect();
+	setConnected(false);
+	console.log("Disconnected");
+}
+
+function sendmessage() {
+	stompClient.send("/app/message", {}, JSON.stringify({
+		'userName' : userName,
+		'content' : $('#message').val()
+	}));
+}
+
+function showMessage(userName, message) {
+	var messageBox = $('<div>').addClass("message-box");
+	var userNameDiv = $('<div>').addClass("username").text(userName);
+	var messageDiv  = $('<div>').text(message);
+	messageBox.append(userNameDiv);
+	messageBox.append(messageDiv);
+	
+	$('#chatarea').append(messageBox);
+}
+/*]]>*/
+</script>
+</head>
+<body>
+<div th:text="${userName}">userName</div>
+<div>
+	<div>
+		<button id="connect" onclick="connect();">Connect</button>
+		<button id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
+	</div>
+	<div id="conversationDiv">
+		<div id="chatarea">
+			<div class="message-box" th:each="chatItem : ${chatItems}">
+				<div class="username" th:text="${chatItem.userName}">userName</div>
+				<div th:text="${chatItem.message}">message</div>
+			</div>
+		</div>
+		<label>message</label><input type="text" id="message" />
+		<button id="sendmessage" onclick="sendmessage();">Send</button>
+	</div>
+</div>
+</body>
+</html>

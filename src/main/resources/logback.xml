@@ -1,0 +1,27 @@
+<configuration>
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<target>System.out</target>
+		<encoder>
+			<pattern>[%-5level] [%date] [%thread] %logger{50} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="com.websockettest" level="DEBUG" />
+
+	<!--
+	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
+		<file>/usr/var/log/admintool/admintool-logger.txt</file>
+		<encoder>
+			<charset>UTF-8</charset>
+			<pattern>[%-5level] [%date] [%thread] %logger{50} - %msg%n</pattern>
+		</encoder>
+	</appender>
+	-->
+
+	<root>
+		<level value="INFO" />
+		<appender-ref ref="STDOUT" />
+		<!-- <appender-ref ref="FILE" /> -->
+	</root>
+
+</configuration>
