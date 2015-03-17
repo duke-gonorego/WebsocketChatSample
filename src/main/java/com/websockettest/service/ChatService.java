@@ -1,5 +1,6 @@
 package com.websockettest.service;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -21,7 +22,10 @@ public class ChatService {
 	
 	public List<ChatItem> loadPastMessage() {
 		
-		return dynamoDBAPI.getChatItemsByCommentedDatetime(System.currentTimeMillis());
+		List<ChatItem>chatItems = dynamoDBAPI.getChatItems();
+		Collections.reverse(chatItems);
+		
+		return chatItems;
 	}
 	
 	public void putMessage(RequestMessage requestMessage){

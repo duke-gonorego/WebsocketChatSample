@@ -17,7 +17,6 @@ import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.ItemCollection;
 import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
-import com.amazonaws.services.dynamodbv2.document.RangeKeyCondition;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
@@ -40,6 +39,7 @@ public class DynamoDBAPI {
 	private final String ENDPOINT          = "http://localhost:8000";
 	private static final String TABLE_NAME = "chat";
 	private static final int ROOM_ID       = 1;
+	private static final int MAX_RESULT_SIZE = 10;
 	
 	private DynamoDB dynamoDB;
 	
@@ -64,15 +64,12 @@ public class DynamoDBAPI {
 		dynamoDB.getTable(TABLE_NAME).putItem(item);
 	}
 	
-	public List<ChatItem> getChatItemsByCommentedDatetime(Long commentedDatetime){
-
-		RangeKeyCondition rangeKeyCondition
-			= new RangeKeyCondition("commented_datetime").le(String.valueOf(commentedDatetime));
+	public List<ChatItem> getChatItems(){
+		
 		QuerySpec spec = new QuerySpec()
 			.withHashKey("room_id", ROOM_ID)
-			.withRangeKeyCondition(rangeKeyCondition)
-			.withScanIndexForward(true)
-			.withMaxResultSize(10);
+			.withScanIndexForward(false)
+			.withMaxResultSize(MAX_RESULT_SIZE);
 			
 		ItemCollection<QueryOutcome>items = dynamoDB.getTable(TABLE_NAME).query(spec);
 		List<ChatItem>chatItems = new ArrayList<ChatItem>();
