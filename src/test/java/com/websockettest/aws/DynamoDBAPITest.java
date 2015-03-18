@@ -32,7 +32,7 @@ public class DynamoDBAPITest {
 	}
 	
 	@Test
-	public void getChatItemsByCommentedDatetime() {
+	public void getChatItems() {
 	
 		List<ChatItem> chatItems = dynamoDBAPI.getChatItems();
 		System.out.println(chatItems);
